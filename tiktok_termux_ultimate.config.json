@@ -1,0 +1,7 @@
+{
+  "download_dir": "C:/Users/ADMIN/Downloads/TIKTOK_TERMUX_PRO",
+  "quick_mode": true,
+  "max_workers": 4,
+  "request_timeout_sec": 15,
+  "http_proxy": ""
+}
