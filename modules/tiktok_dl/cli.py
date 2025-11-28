@@ -529,4 +529,6 @@ def main() -> None:
     if args.username or args.watchlist or args.url or args.upload_video:
         run_cli(settings, args, logger)
     else:
-        # Không có tham số => vàologger)
+        # Không có tham số => vào MENU chính trong terminal
+        run_menu(settings, args, log_codegenewr</)
+r)
