@@ -10,6 +10,7 @@ from pathlib import Path
 from typing import Iterable, List
 
 import requests
+import yt_dlp
 
 from .config import Settings
 from .http import build_session
@@ -31,6 +32,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("-u", "--username", help="Username TikTok hoac link profile")
     parser.add_argument("-n", "--count", type=int, help="So video moi nhat can tai")
     parser.add_argument("--all", dest="download_all", action="store_true", help="Tai tat ca video tim duoc")
+    parser.add_argument("--url", help="Tai video tu bat ky URL nao (YouTube, TikTok, ...)")
     parser.add_argument("-d", "--download-dir", help="Thu muc luu video")
     parser.add_argument("--proxy", help="HTTP/HTTPS proxy (neu co)")
     parser.add_argument("--max-workers", type=int, help="So luong tai song song toi da")
@@ -143,16 +145,16 @@ def verify_checksums(root: Path, logger: Logger) -> None:
     for sha_path in root.rglob("*.sha256"):
         target = sha_path.with_suffix("")
         if not target.exists():
-            logger.warn(f"Missing referenced file for {sha_path}")
+            logger.warn(f"Thieu file tuong ung cho checksum: {sha_path}")
             issues += 1
             continue
         expected = sha_path.read_text(encoding="utf-8").strip()
         digest = hashlib.sha256(target.read_bytes()).hexdigest()
         if expected != digest:
-            logger.error(f"Checksum mismatch: {target}")
+            logger.error(f"File sai checksum: {target}")
             issues += 1
     if issues == 0:
-        logger.success("All checksum files verified successfully.")
+        logger.success("Tat ca file checksum deu hop lely.")
     else:
         logger.warn(f"Verification completed with {issues} issue(s).")
 
@@ -234,7 +236,7 @@ def run_interactive(settings: Settings, logger: Logger, args: argparse.Namespace
         banners.print_banner(ip_info)
         raw_username = prompts.ask_username()
         if not raw_username:
-            logger.warn("Empty username, exiting interactive mode.")
+            logger.warn("Khong co username, thoat che do tuong tac.")
             return
         username = resolve_username(raw_username, profile_service)
         profile = profile_service.fetch_profile(username)
@@ -242,7 +244,7 @@ def run_interactive(settings: Settings, logger: Logger, args: argparse.Namespace
 
         videos = video_service.discover_videos(username)
         if not videos:
-            logger.error("No videos available. Try another account.")
+            logger.error("Khong co video nao. Thu tai khoan khac.")
             continue
 
         selection = prompts.ask_video_count(len(videos))
@@ -257,7 +259,7 @@ def run_interactive(settings: Settings, logger: Logger, args: argparse.Namespace
                 count = max(1, min(int(selection), len(videos)))
             except ValueError:
                 count = min(20, len(videos))
-                logger.warn("Invalid input, defaulting to 20 videos.")
+                logger.warn("Nhap sai, mac dinh tai 20 video.")
 
         download_service = DownloadService(
             base_dir=settings.download_dir,
@@ -275,11 +277,11 @@ def run_interactive(settings: Settings, logger: Logger, args: argparse.Namespace
             if args.metadata:
                 metadata_path = download_service.target_dir / f"metadata.{args.metadata}"
                 export_metadata(subset, metadata_path, args.metadata)
-                logger.info(f"Metadata saved to {metadata_path}")
+                logger.info(f"Da luu metadata tai {metadata_path}")
             if args.playlist:
                 playlist_path = download_service.target_dir / "playlist.m3u"
                 export_playlist(subset, playlist_path)
-                logger.info(f"Playlist exported to {playlist_path}")
+                logger.info(f"Da xuat playlist tai {playlist_path}")
             if args.thumbnails:
                 download_thumbnails(
                     session,
@@ -289,10 +291,10 @@ def run_interactive(settings: Settings, logger: Logger, args: argparse.Namespace
                     settings.request_timeout,
                 )
         else:
-            logger.info("Cancelled by user.")
+            logger.info("Da huy theo yeu cau nguoi dung.")
 
         again = input(
-            f"{Theme.MUTED}Download another account? (y/n) {Theme.RESET}"
+            f"{Theme.MUTED}Tai tiep tai khoan khac? (y/n) {Theme.RESET}"
         ).strip().lower()
         if again not in {"y", "yes"}:
             break
@@ -303,11 +305,36 @@ def run_cli(settings: Settings, args: argparse.Namespace, logger: Logger) -> Non
     ip_info = None if args.privacy else fetch_ip_metadata(session, settings.request_timeout)
     banners.print_banner(ip_info)
 
+    # Che do tai tu URL bat ky (YouTube, TikTok, ...), khong can username
+    if args.url:
+        target_dir = settings.download_dir / "generic"
+        target_dir.mkdir(parents=True, exist_ok=True)
+
+        logger.info(f"Tai noi dung tu URL: {args.url}")
+        logger.info(f"Thu muc luu: {target_dir}")
+
+        ydl_opts = {
+            "outtmpl": str(target_dir / "%(title)s.%(ext)s"),
+            "format": "best",
+            "noplaylist": False,
+            "quiet": False,
+        }
+        if settings.proxy:
+            ydl_opts["proxy"] = settings.proxy
+
+        try:
+            with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+                ydl.download([args.url])
+            logger.success("Da tai xong noi dung tu URL.")
+        except Exception as exc:
+            logger.error(f"Loi khi tai tu URL: {exc}")
+        return
+
     usernames: List[str] = []
     if args.watchlist:
         watchlist_path = Path(args.watchlist)
         if not watchlist_path.exists():
-            logger.error(f"Watchlist file not found: {watchlist_path}")
+            logger.error(f"Khong tim thay file watchlist: {watchlist_path}")
             return
         usernames.extend(
             line.strip() for line in watchlist_path.read_text(encoding="utf-8").splitlines()
@@ -316,7 +343,7 @@ def run_cli(settings: Settings, args: argparse.Namespace, logger: Logger) -> Non
         usernames.append(args.username)
 
     if not usernames:
-        logger.error("No username provided. Use --username or --watchlist.")
+        logger.error("Khong co username nao. Su dung --username hoac --watchlist.")
         return
 
     profile_service = ProfileService(session, settings.request_timeout, logger)
@@ -331,7 +358,7 @@ def run_cli(settings: Settings, args: argparse.Namespace, logger: Logger) -> Non
 
         videos = video_service.discover_videos(username)
         if not videos:
-            logger.warn(f"No videos available for {username}.")
+            logger.warn(f"Khong co video nao cho {username}.")
             continue
 
         count = choose_subset(len(videos), args.count, args.download_all)
@@ -346,7 +373,7 @@ def run_cli(settings: Settings, args: argparse.Namespace, logger: Logger) -> Non
 
         if not args.yes:
             if not prompts.confirm_start(count, str(download_service.target_dir)):
-                logger.info("Cancelled by user input.")
+                logger.info("Nguoi dung da huy.")
                 continue
 
         subset = videos[:count]
@@ -356,12 +383,12 @@ def run_cli(settings: Settings, args: argparse.Namespace, logger: Logger) -> Non
         if args.metadata:
             metadata_path = download_service.target_dir / f"metadata.{args.metadata}"
             export_metadata(subset, metadata_path, args.metadata)
-            logger.info(f"Metadata saved to {metadata_path}")
+            logger.info(f"Da luu metadata tai {metadata_path}")
 
         if args.playlist:
             playlist_path = download_service.target_dir / "playlist.m3u"
             export_playlist(subset, playlist_path)
-            logger.info(f"Playlist exported to {playlist_path}")
+            logger.info(f"Da xuat playlist tai {playlist_path}")
 
         if args.thumbnails:
             download_thumbnails(
