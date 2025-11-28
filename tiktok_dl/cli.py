@@ -246,7 +246,11 @@ def run_interactive(settings: Settings, logger: Logger, args: argparse.Namespace
             continue
 
         selection = prompts.ask_video_count(len(videos))
-        if selection.lower() == "all":
+
+        # Hỗ trợ chọn bằng số:
+        # - Enter hoặc "0" hoặc "all" => tải tất cả
+        # - Số bất kỳ > 0           => giới hạn theo số đó
+        if not selection or selection == "0" or selection.lower() == "all":
             count = len(videos)
         else:
             try:
