@@ -13,6 +13,7 @@ import requests
 import yt_dlp
 
 from .config import Settings
+from .gui import run_gui
 from .http import build_session
 from .logging import Logger
 from .models import VideoItem
@@ -54,7 +55,9 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--verify", action="store_true", help="Kiem tra file checksum hien co va thoat")
     parser.add_argument("--yes", action="store_true", help="Tu dong chap nhan cac cau hoi (khong hoi lai)")
     parser.add_argument("--api", action="store_true", help="Du phong cho che do REST API trong tuong lai")
-    return parser.parse_args()
+    parser.add_argument("--gui", action="store_true", help="Mo giao dien GUI thay vi chay trong terminal")
+    return parser.parse_ar_codegsnew(</)
+
 
 
 def run_self_check(logger: Logger) -> None:
@@ -517,7 +520,9 @@ def main() -> None:
     if args.api:
         logger.warn("REST API mode is not implemented yet. Continuing with CLI mode.")
 
-    # Nếu có tham số cụ thể (username/watchlist/url/upload-video) thì chạy CLI trực tiếp
+    if args.gui:
+        # Mở giao diện GUI và thoát, không chạy CLI
+ chạy CLI trực tiếp
     if args.username or args.watchlist or args.url or args.upload_video:
         run_cli(settings, args, logger)
     else:
