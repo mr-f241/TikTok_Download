@@ -56,7 +56,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--yes", action="store_true", help="Tu dong chap nhan cac cau hoi (khong hoi lai)")
     parser.add_argument("--api", action="store_true", help="Du phong cho che do REST API trong tuong lai")
     parser.add_argument("--gui", action="store_true", help="Mo giao dien GUI thay vi chay trong terminal")
-    return parser.parse_ar_codegsnew(</)
+    return parser.parse_args()
 
 
 
@@ -521,9 +521,9 @@ def main() -> None:
         logger.warn("REST API mode is not implemented yet. Continuing with CLI mode.")
 
     if args.gui:
-        # Mở giao diện GUI và thoát, không chạy CLI
- chạy CLI trực tiếp
-    if args.username or args.watchlist or args.url or args.upload_video:
+        # Mở giao diện GUI và thoát, không chạy CLI/menutext
+        run_gui()
+args.username or args.watchlist or args.url or args.upload_video:
         run_cli(settings, args, logger)
     else:
         # Không có tham số => vào MENU chính
