@@ -417,6 +417,75 @@ def run_cli(settings: Settings, args: argparse.Namespace, logger: Logger) -> Non
             )
 
 
+def run_menu(settings: Settings, args: argparse.Namespace, logger: Logger) -> None:
+    """
+    Menu chính khi chạy mà không truyền tham số.
+    Cho phép chọn: tải TikTok, tải từ URL, upload TikTok, kiểm tra checksum, thoát.
+    """
+    while True:
+        session = build_session(settings.proxy)
+        ip_info = None if args.privacy else fetch_ip_metadata(session, settings.request_timeout)
+        banners.print_banner(ip_info)
+
+        print(f"{Theme.PRIMARY}{Theme.BOLD}Chọn chế độ hoạt động:{Theme.RESET}")
+        print(f"{Theme.MUTED}1) Tải video TikTok theo username{Theme.RESET}")
+        print(f"{Theme.MUTED}2) Tải nội dung từ URL bất kỳ (YouTube, TikTok, ...){Theme.RESET}")
+        print(f"{Theme.MUTED}3) Upload video lên TikTok (dùng cookies/sessionid){Theme.RESET}")
+        print(f"{Theme.MUTED}4) Kiểm tra file checksum trong thư mục tải về{Theme.RESET}")
+        print(f"{Theme.MUTED}5) Thoát{Theme.RESET}")
+        choice = input(f"{Theme.MUTED}Nhập lựa chọn (1-5): {Theme.PRIMARY}").strip()
+
+        if choice == "1":
+            # Vào chế độ tương tác cũ: hỏi username, số video, tải về
+            run_interactive(settings, logger, args)
+        elif choice == "2":
+            url = input(
+                f"{Theme.MUTED}Nhập URL cần tải (YouTube, TikTok, ...): {Theme.PRIMARY}"
+            ).strip()
+            if not url:
+                logger.warn("Không có URL, quay lại menu.")
+                continue
+            # Tạm gán vào args để tái sử dụng run_cli
+            args.url = url  # type: ignore[attr-defined]
+            run_cli(settings, args, logger)
+            args.url = None  # type: ignore[assignment]
+            input(f"{Theme.MUTED}Nhấn Enter để quay lại menu...{Theme.RESET}")
+        elif choice == "3":
+            video_path = input(
+                f"{Theme.MUTED}Đường dẫn file video cần upload: {Theme.PRIMARY}"
+            ).strip()
+            if not video_path:
+                logger.warn("Không có đường dẫn video, quay lại menu.")
+                continue
+            desc = input(
+                f"{Theme.MUTED}Mô tả (caption) cho video (có thể bỏ trống): {Theme.PRIMARY}"
+            ).strip()
+            cookies_file = input(
+                f"{Theme.MUTED}Đường dẫn file cookies JSON (Enter nếu không dùng): {Theme.PRIMARY}"
+            ).strip() or None
+            sessionid = input(
+                f"{Theme.MUTED}Giá trị cookie sessionid (Enter nếu không dùng): {Theme.PRIMARY}"
+            ).strip() or None
+
+            upload_with_tiktok_uploader(
+                video_path=video_path,
+                description=desc or None,
+                logger=logger,
+                cookies_file=cookies_file,
+                sessionid=sessionid,
+                proxy=settings.proxy,
+            )
+            input(f"{Theme.MUTED}Nhấn Enter để quay lại menu...{Theme.RESET}")
+        elif choice == "4":
+            verify_checksums(settings.download_dir, logger)
+            input(f"{Theme.MUTED}Nhấn Enter để quay lại menu...{Theme.RESET}")
+        elif choice == "5":
+            logger.info("Thoát công cụ theo yêu cầu người dùng.")
+            break
+        else:
+            logger.warn("Lựa chọn không hợp lệ, vui lòng nhập 1-5.")
+
+
 def main() -> None:
     args = parse_args()
     logger = Logger()
@@ -448,10 +517,9 @@ def main() -> None:
     if args.api:
         logger.warn("REST API mode is not implemented yet. Continuing with CLI mode.")
 
-    # Giữ hành vi đơn giản theo yêu cầu:
-    # - Có username/watchlist/url/upload-video -> chạy CLI (không hỏi gì thêm)
-    # - Không có gì -> vào chế độ tương tác cũ, hỏi username
+    # Nếu có tham số cụ thể (username/watchlist/url/upload-video) thì chạy CLI trực tiếp
     if args.username or args.watchlist or args.url or args.upload_video:
         run_cli(settings, args, logger)
     else:
-        run_interactive(settings, logger, args)
+        # Không có tham số => vào MENU chính
+        run_menu(settings, args, logger)
