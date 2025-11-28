@@ -17,6 +17,7 @@ from .http import build_session
 from .logging import Logger
 from .models import VideoItem
 from .services.download_service import DownloadService
+from .uploader_bridge import upload_with_tiktok_uploader
 from .services.profile_service import ProfileService
 from .services.video_service import VideoService
 from .theme import Theme
@@ -33,6 +34,10 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("-n", "--count", type=int, help="So video moi nhat can tai")
     parser.add_argument("--all", dest="download_all", action="store_true", help="Tai tat ca video tim duoc")
     parser.add_argument("--url", help="Tai video tu bat ky URL nao (YouTube, TikTok, ...)")
+    parser.add_argument("--upload-video", help="Duong dan toi file video can upload len TikTok")
+    parser.add_argument("--upload-desc", help="Mo ta/ caption khi upload len TikTok")
+    parser.add_argument("--upload-cookies", help="File cookies (JSON) dung cho upload TikTok")
+    parser.add_argument("--upload-sessionid", help="Gia tri cookie 'sessionid' dung cho upload TikTok")
     parser.add_argument("-d", "--download-dir", help="Thu muc luu video")
     parser.add_argument("--proxy", help="HTTP/HTTPS proxy (neu co)")
     parser.add_argument("--max-workers", type=int, help="So luong tai song song toi da")
@@ -304,6 +309,18 @@ def run_cli(settings: Settings, args: argparse.Namespace, logger: Logger) -> Non
     session = build_session(settings.proxy)
     ip_info = None if args.privacy else fetch_ip_metadata(session, settings.request_timeout)
     banners.print_banner(ip_info)
+
+    # Che do upload video len TikTok bang thu vien tiktok_uploader
+    if args.upload_video:
+        upload_with_tiktok_uploader(
+            video_path=args.upload_video,
+            description=args.upload_desc,
+            logger=logger,
+            cookies_file=args.upload_cookies,
+            sessionid=args.upload_sessionid,
+            proxy=settings.proxy,
+        )
+        return
 
     # Che do tai tu URL bat ky (YouTube, TikTok, ...), khong can username
     if args.url:
