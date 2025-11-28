@@ -417,6 +417,70 @@ def run_cli(settings: Settings, args: argparse.Namespace, logger: Logger) -> Non
             )
 
 
+def run_menu(settings: Settings, args: argparse.Namespace, logger: Logger) -> None:
+    """
+    Menu chinh khi chay ma khong truyen tham so.
+    Cho phep chon: tai TikTok, tai tu URL, upload TikTok, kiem tra checksum, thoat.
+    """
+    while True:
+        banners.print_banner(
+            None if args.privacy else fetch_ip_metadata(build_session(settings.proxy), settings.request_timeout)
+        )
+        print(f"{Theme.PRIMARY}{Theme.BOLD}Chon che do hoat dong:{Theme.RESET}")
+        print(f"{Theme.MUTED}1) Tai video TikTok theo username{Theme.RESET}")
+        print(f"{Theme.MUTED}2) Tai noi dung tu URL bat ky (YouTube, TikTok, ...){Theme.RESET}")
+        print(f"{Theme.MUTED}3) Upload video len TikTok (su dung cookies/sessionid){Theme.RESET}")
+        print(f"{Theme.MUTED}4) Kiem tra file checksum trong thu muc tai ve{Theme.RESET}")
+        print(f"{Theme.MUTED}5) Thoat{Theme.RESET}")
+        choice = input(f"{Theme.MUTED}Nhap lua chon (1-5): {Theme.PRIMARY}").strip()
+
+        if choice == "1":
+            # Vao che do tuong tac cu: hoi username, so video, tai ve
+            run_interactive(settings, logger, args)
+        elif choice == "2":
+            url = input(
+                f"{Theme.MUTED}Nhap URL can tai (YouTube, TikTok, ...): {Theme.PRIMARY}"
+            ).strip()
+            if not url:
+                logger.warn("Khong co URL, quay lai menu.")
+                continue
+            args.url = url  # type: ignore[attr-defined]
+            run_cli(settings, args, logger)
+        elif choice == "3":
+            video_path = input(
+                f"{Theme.MUTED}Duong dan file video can upload: {Theme.PRIMARY}"
+            ).strip()
+            if not video_path:
+                logger.warn("Khong co duong dan video, quay lai menu.")
+                continue
+            desc = input(
+                f"{Theme.MUTED}Mo ta (caption) cho video (co the bo trong): {Theme.PRIMARY}"
+            ).strip()
+            cookies_file = input(
+                f"{Theme.MUTED}Duong dan file cookies JSON (Enter neu khong dung): {Theme.PRIMARY}"
+            ).strip() or None
+            sessionid = input(
+                f"{Theme.MUTED}Gia tri cookie sessionid (Enter neu khong dung): {Theme.PRIMARY}"
+            ).strip() or None
+
+            upload_with_tiktok_uploader(
+                video_path=video_path,
+                description=desc or None,
+                logger=logger,
+                cookies_file=cookies_file,
+                sessionid=sessionid,
+                proxy=settings.proxy,
+            )
+        elif choice == "4":
+            verify_checksums(settings.download_dir, logger)
+            input(f"{Theme.MUTED}Nhan Enter de quay lai menu...{Theme.RESET}")
+        elif choice == "5":
+            logger.info("Thoat cong cu theo yeu cau nguoi dung.")
+            break
+        else:
+            logger.warn("Lua chon khong hop le, vui long nhap 1-5.")
+
+
 def main() -> None:
     args = parse_args()
     logger = Logger()
@@ -448,7 +512,9 @@ def main() -> None:
     if args.api:
         logger.warn("REST API mode is not implemented yet. Continuing with CLI mode.")
 
-    if args.username or args.watchlist:
+    # Neu co tham so cu the (username/watchlist/url/upload-video) thi chay thang CLI nhu cu
+    if args.username or args.watchlist or args.url or args.upload_video:
         run_cli(settings, args, logger)
     else:
-        run_interactive(settings, logger, args)
+        # Khong co tham so => vao menu chinh
+        run_menu(settings, args, logger)
