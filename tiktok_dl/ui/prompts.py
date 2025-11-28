@@ -10,9 +10,14 @@ def ask_username() -> str:
 
 
 def ask_video_count(total: int) -> str:
-    return input(
-        f"{Theme.MUTED}How many recent videos? (1-{total}, 'all' for everything) {Theme.RESET}"
+    # Cho phép bấm Enter để chọn "tất cả" cho tiện,
+    # đỡ phải gõ chữ "all" mỗi lần.
+    value = input(
+        f"{Theme.MUTED}How many recent videos? (1-{total}, 'all' or Enter for everything) {Theme.RESET}"
     ).strip()
+    if not value:
+        return "all"
+    return value
 
 
 def confirm_start(count: int, folder: str) -> bool:
