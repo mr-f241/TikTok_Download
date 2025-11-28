@@ -521,10 +521,12 @@ def main() -> None:
         logger.warn("REST API mode is not implemented yet. Continuing with CLI mode.")
 
     if args.gui:
-        # Mở giao diện GUI và thoát, không chạy CLI/menutext
+        # Mở giao diện GUI và thoát, không chạy CLI/menu text
         run_gui()
-args.username or args.watchlist or args.url or args.upload_video:
+        return
+
+    # Nếu có tham số cụ thể (username/watchlist/url/upload-video) thì chạy CLI trực tiếp
+    if args.username or args.watchlist or args.url or args.upload_video:
         run_cli(settings, args, logger)
     else:
-        # Không có tham số => vào MENU chính
-        run_menu(settings, args, logger)
+        # Không có tham số => vàologger)
