@@ -43,22 +43,22 @@ def _arrow_video_picker(total: int) -> str:
             stdscr.addstr(
                 0,
                 0,
-                "Chon so video gan nhat can tai:",
+                "Chọn số video gần nhất cần tải:",
                 curses.A_BOLD,
             )
-            stdscr.addstr(2, 0, f"Co san: {total}")
+            stdscr.addstr(2, 0, f"Có sẵn: {total}")
             if current >= total:
-                label = f"TAT CA ({total})"
+                label = f"TẤT CẢ ({total})"
             else:
                 label = str(current)
-            stdscr.addstr(4, 0, f"Lua chon hien tai: {label}", curses.A_REVERSE)
+            stdscr.addstr(4, 0, f"Lựa chọn hiện tại: {label}", curses.A_REVERSE)
 
-            stdscr.addstr(6, 0, "Dieu khien:")
+            stdscr.addstr(6, 0, "Điều khiển:")
             stdscr.addstr(7, 2, "↑ / ↓ : +/- 1")
             stdscr.addstr(8, 2, "← / → : -/+ 10")
-            stdscr.addstr(9, 2, "A     : Tat ca video")
-            stdscr.addstr(10, 2, "Enter : Xac nhan")
-            stdscr.addstr(12, 0, "Nhan 'q' de huy (se quay ve che do nhap so).")
+            stdscr.addstr(9, 2, "A     : Tất cả video")
+            stdscr.addstr(10, 2, "Enter : Xác nhận")
+            stdscr.addstr(12, 0, "Nhấn 'q' để hủy (sẽ quay về chế độ nhập số).")
 
             stdscr.refresh()
             key = stdscr.getch()
