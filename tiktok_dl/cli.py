@@ -25,28 +25,28 @@ from .utils import fetch_ip_metadata
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="TikTok Downloader Pro - clean, modular edition",
+        description="TikTok Downloader Pro - trinh tai video TikTok don gian, de dung",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
-    parser.add_argument("-u", "--username", help="TikTok username or profile URL")
-    parser.add_argument("-n", "--count", type=int, help="Number of latest videos")
-    parser.add_argument("--all", dest="download_all", action="store_true", help="Download every video discovered")
-    parser.add_argument("-d", "--download-dir", help="Custom download directory")
-    parser.add_argument("--proxy", help="HTTP/HTTPS proxy")
-    parser.add_argument("--max-workers", type=int, help="Max simultaneous downloads")
-    parser.add_argument("--request-timeout", type=int, help="Network timeout seconds")
-    parser.add_argument("--quick", action="store_true", help="Quick mode (less shell coloring)")
-    parser.add_argument("--privacy", action="store_true", help="Suppress IP information in banners")
-    parser.add_argument("--metadata", choices=["json", "csv"], help="Export metadata alongside downloads")
-    parser.add_argument("--thumbnails", action="store_true", help="Download thumbnails for each video")
-    parser.add_argument("--playlist", action="store_true", help="Export playlist file (.m3u) with video URLs")
-    parser.add_argument("--rate-limit", type=int, help="Maximum downloads per minute")
-    parser.add_argument("--schedule", help="Defer run until HH:MM (24 hour)")
-    parser.add_argument("--watchlist", help="Path to file containing one username per line")
-    parser.add_argument("--self-check", action="store_true", help="Run environment diagnostics and exit")
-    parser.add_argument("--verify", action="store_true", help="Verify existing checksum files and exit")
-    parser.add_argument("--yes", action="store_true", help="Auto-confirm prompts in CLI mode")
-    parser.add_argument("--api", action="store_true", help="Reserved for future REST API mode")
+    parser.add_argument("-u", "--username", help="Username TikTok hoac link profile")
+    parser.add_argument("-n", "--count", type=int, help="So video moi nhat can tai")
+    parser.add_argument("--all", dest="download_all", action="store_true", help="Tai tat ca video tim duoc")
+    parser.add_argument("-d", "--download-dir", help="Thu muc luu video")
+    parser.add_argument("--proxy", help="HTTP/HTTPS proxy (neu co)")
+    parser.add_argument("--max-workers", type=int, help="So luong tai song song toi da")
+    parser.add_argument("--request-timeout", type=int, help="Thoi gian timeout mang (giay)")
+    parser.add_argument("--quick", action="store_true", help="Che do nhanh (giam mau sac trong shell)")
+    parser.add_argument("--privacy", action="store_true", help="An thong tin IP tren banner")
+    parser.add_argument("--metadata", choices=["json", "csv"], help="Xuat metadata kem theo video")
+    parser.add_argument("--thumbnails", action="store_true", help="Tai thumbnail cho tung video")
+    parser.add_argument("--playlist", action="store_true", help="Xuat file playlist (.m3u) chua link video")
+    parser.add_argument("--rate-limit", type=int, help="Gioi han so luong tai moi phut")
+    parser.add_argument("--schedule", help="Hen gio chay (dinh dang HH:MM, 24h)")
+    parser.add_argument("--watchlist", help="File chua danh sach username (moi dong 1 username)")
+    parser.add_argument("--self-check", action="store_true", help="Kiem tra moi truong va thoat")
+    parser.add_argument("--verify", action="store_true", help="Kiem tra file checksum hien co va thoat")
+    parser.add_argument("--yes", action="store_true", help="Tu dong chap nhan cac cau hoi (khong hoi lai)")
+    parser.add_argument("--api", action="store_true", help="Du phong cho che do REST API trong tuong lai")
     return parser.parse_args()
 
 

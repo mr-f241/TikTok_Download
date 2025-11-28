@@ -13,7 +13,7 @@ except Exception:  # curses không có trên một số môi trường (Windows 
 
 def ask_username() -> str:
     return input(
-        f"{Theme.MUTED}Enter TikTok username or profile URL: {Theme.PRIMARY}"
+        f"{Theme.MUTED}Nhập username TikTok hoặc link profile: {Theme.PRIMARY}"
     ).strip()
 
 
@@ -43,22 +43,22 @@ def _arrow_video_picker(total: int) -> str:
             stdscr.addstr(
                 0,
                 0,
-                "Select number of recent videos to download:",
+                "Chon so video gan nhat can tai:",
                 curses.A_BOLD,
             )
-            stdscr.addstr(2, 0, f"Total available: {total}")
+            stdscr.addstr(2, 0, f"Co san: {total}")
             if current >= total:
-                label = f"ALL ({total})"
+                label = f"TAT CA ({total})"
             else:
                 label = str(current)
-            stdscr.addstr(4, 0, f"Current selection: {label}", curses.A_REVERSE)
+            stdscr.addstr(4, 0, f"Lua chon hien tai: {label}", curses.A_REVERSE)
 
-            stdscr.addstr(6, 0, "Controls:")
+            stdscr.addstr(6, 0, "Dieu khien:")
             stdscr.addstr(7, 2, "↑ / ↓ : +/- 1")
             stdscr.addstr(8, 2, "← / → : -/+ 10")
-            stdscr.addstr(9, 2, "A     : All videos")
-            stdscr.addstr(10, 2, "Enter : Confirm selection")
-            stdscr.addstr(12, 0, "Press 'q' to cancel (default = 20 or all).")
+            stdscr.addstr(9, 2, "A     : Tat ca video")
+            stdscr.addstr(10, 2, "Enter : Xac nhan")
+            stdscr.addstr(12, 0, "Nhan 'q' de huy (se quay ve che do nhap so).")
 
             stdscr.refresh()
             key = stdscr.getch()
@@ -99,12 +99,12 @@ def ask_video_count(total: int) -> str:
 
     # Fallback: dùng nhập số như bình thường
     return input(
-        f"{Theme.MUTED}How many recent videos? (1-{total}, 0 or 'all' or Enter for everything) {Theme.RESET}"
+        f"{Theme.MUTED}Tải bao nhiêu video gần nhất? (1-{total}, 0 hoặc 'all' hoặc Enter = tất cả) {Theme.RESET}"
     ).strip()
 
 
 def confirm_start(count: int, folder: str) -> bool:
     reply = input(
-        f"{Theme.MUTED}Download {count} video(s) to {folder}? (y/n) {Theme.RESET}"
+        f"{Theme.MUTED}Tải {count} video vào thư mục {folder}? (y/n) {Theme.RESET}"
     ).strip().lower()
     return reply in {"y", "yes"}
