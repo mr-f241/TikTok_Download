@@ -14,16 +14,16 @@ class Logger:
         return f"{Theme.MUTED}{self.prefix}{Theme.RESET} {level} {message}{Theme.RESET}"
 
     def info(self, message: str) -> None:
-        print(self._line(f"{Theme.PRIMARY}INFO", message))
+        print(self._line(f"{Theme.PRIMARY}THONG TIN", message))
 
     def success(self, message: str) -> None:
         print(self._line(f"{Theme.SUCCESS}OK", message))
 
     def warn(self, message: str) -> None:
-        print(self._line(f"{Theme.WARNING}WARN", message))
+        print(self._line(f"{Theme.WARNING}CANH BAO", message))
 
     def error(self, message: str) -> None:
-        print(self._line(f"{Theme.ERROR}ERROR", message))
+        print(self._line(f"{Theme.ERROR}LOI", message))
 
     def bullet_list(self, title: str, items: Iterable[str]) -> None:
         self.info(title)

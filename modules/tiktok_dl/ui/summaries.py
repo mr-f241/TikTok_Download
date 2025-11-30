@@ -10,18 +10,18 @@ from ..utils import human_timestamp
 
 def print_profile(profile: UserProfile | None, logger: Logger) -> None:
     if not profile:
-        logger.warn("Proceeding without profile details.")
+        logger.warn("Khong lay duoc thong tin profile, tiep tuc khong co chi tiet.")
         return
 
     logger.bullet_list(
-        "Profile summary:",
+        "Thong tin tai khoan:",
         [
-            f"{Theme.MUTED}Nickname: {Theme.ACCENT}{profile.nickname}{Theme.RESET}",
+            f"{Theme.MUTED}Ten hien thi: {Theme.ACCENT}{profile.nickname}{Theme.RESET}",
             f"{Theme.MUTED}Username: {Theme.ACCENT}@{profile.unique_id}{Theme.RESET}",
-            f"{Theme.MUTED}Followers: {Theme.ACCENT}{profile.follower_count:,}{Theme.RESET}",
-            f"{Theme.MUTED}Videos: {Theme.ACCENT}{profile.video_count:,}{Theme.RESET}",
-            f"{Theme.MUTED}Verified: {Theme.ACCENT}{'Yes' if profile.verified else 'No'}{Theme.RESET}",
-            f"{Theme.MUTED}Private: {Theme.ACCENT}{'Yes' if profile.private else 'No'}{Theme.RESET}",
+            f"{Theme.MUTED}Follower: {Theme.ACCENT}{profile.follower_count:,}{Theme.RESET}",
+            f"{Theme.MUTED}So video: {Theme.ACCENT}{profile.video_count:,}{Theme.RESET}",
+            f"{Theme.MUTED}Da tick xanh: {Theme.ACCENT}{'Co' if profile.verified else 'Khong'}{Theme.RESET}",
+            f"{Theme.MUTED}Tai khoan rieng tu: {Theme.ACCENT}{'Co' if profile.private else 'Khong'}{Theme.RESET}",
         ],
     )
     if profile.signature:
@@ -35,12 +35,12 @@ def print_results(results: list[DownloadResult], logger: Logger) -> None:
     blocked = sum(1 for r in results if r.status == "blocked")
 
     print()
-    print(f"{Theme.PRIMARY}{Theme.BOLD}Download summary - {human_timestamp()}{Theme.RESET}")
-    print(f"{Theme.SUCCESS}Downloaded: {success}{Theme.RESET}")
-    print(f"{Theme.WARNING}Skipped:   {skipped}{Theme.RESET}")
+    print(f"{Theme.PRIMARY}{Theme.BOLD}Tong ket tai video - {human_timestamp()}{Theme.RESET}")
+    print(f"{Theme.SUCCESS}Da tai:   {success}{Theme.RESET}")
+    print(f"{Theme.WARNING}Bo qua:   {skipped}{Theme.RESET}")
     if blocked:
-        print(f"{Theme.WARNING}Blocked:   {blocked}{Theme.RESET}")
-    print(f"{Theme.ERROR}Failed:    {failed}{Theme.RESET}")
+        print(f"{Theme.WARNING}Bi chan: {blocked}{Theme.RESET}")
+    print(f"{Theme.ERROR}That bai: {failed}{Theme.RESET}")
     print()
 
     for entry in results:
@@ -57,4 +57,4 @@ def print_results(results: list[DownloadResult], logger: Logger) -> None:
         )
 
     print()
-    logger.info("Done.")
+    logger.info("Hoan thanh.")

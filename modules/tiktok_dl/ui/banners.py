@@ -15,13 +15,13 @@ def print_banner(ip_info: dict | None = None) -> None:
     sys_info = system_info()
     header = (
         f"{Theme.PRIMARY}{Theme.BOLD}TikTok Downloader Pro{Theme.RESET}\n"
-        f"{Theme.MUTED}High-quality downloads without distractions{Theme.RESET}\n"
+        f"{Theme.MUTED}Trinh tai video TikTok, gon nhe va de dung{Theme.RESET}\n"
     )
     meta = (
-        f"{Theme.MUTED}User: {Theme.ACCENT}{sys_info['username']}{Theme.RESET}  "
-        f"{Theme.MUTED}Host: {Theme.ACCENT}{sys_info['hostname']}{Theme.RESET}  "
-        f"{Theme.MUTED}Platform: {Theme.ACCENT}{sys_info['platform']}{Theme.RESET}  "
-        f"{Theme.MUTED}Time: {Theme.ACCENT}{human_timestamp()}{Theme.RESET}"
+        f"{Theme.MUTED}Nguoi dung: {Theme.ACCENT}{sys_info['username']}{Theme.RESET}  "
+        f"{Theme.MUTED}May: {Theme.ACCENT}{sys_info['hostname']}{Theme.RESET}  "
+        f"{Theme.MUTED}Nen tang: {Theme.ACCENT}{sys_info['platform']}{Theme.RESET}  "
+        f"{Theme.MUTED}Thoi gian: {Theme.ACCENT}{human_timestamp()}{Theme.RESET}"
     )
     print(header)
     print(meta)
@@ -29,6 +29,6 @@ def print_banner(ip_info: dict | None = None) -> None:
         masked = mask_ip(ip_info.get("ip", ""))
         print(
             f"{Theme.MUTED}IP: {Theme.ACCENT}{masked}{Theme.RESET}  "
-            f"Location: {Theme.ACCENT}{ip_info.get('city', 'unknown')}, {ip_info.get('country', 'unknown')}{Theme.RESET}"
+            f"Vi tri: {Theme.ACCENT}{ip_info.get('city', 'unknown')}, {ip_info.get('country', 'unknown')}{Theme.RESET}"
         )
     print()
